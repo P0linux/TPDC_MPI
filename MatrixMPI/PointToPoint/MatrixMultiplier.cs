@@ -1,12 +1,14 @@
-﻿using MPI;
+﻿using MatrixMPI.Models;
+using MPI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Request = MatrixMPI.Models.Request;
 
-namespace MatrixMPI
+namespace MatrixMPI.PointToPoint
 {
     public static class MatrixMultiplier
     {
@@ -16,7 +18,7 @@ namespace MatrixMPI
             {
                 if (comm.Size < 2)
                     throw new Exception("Run the programm on at least two processors");
-                
+
                 else if (comm.Rank == 0)
                 {
                     var firstMatrix = CreateMatrix(rank);
@@ -49,7 +51,7 @@ namespace MatrixMPI
 
                         var offset = responce.Offset;
 
-                        for (int j = 0; j < responce.ResultMatrix.Length; j++) 
+                        for (int j = 0; j < responce.ResultMatrix.Length; j++)
                             resultMatrix[offset + j] = responce.ResultMatrix[j];
                     }
 
@@ -61,7 +63,7 @@ namespace MatrixMPI
                     watch.Start();
 
                     var simpleMatrix = MultiplyMatrices(firstMatrix, secondMatrix);
-                    
+
                     watch.Stop();
 
                     var timeForSimple = watch.ElapsedMilliseconds;
@@ -69,7 +71,7 @@ namespace MatrixMPI
 
                     Console.WriteLine($"Blocking multiply : {timeForBlocking}");
 
-                    Console.WriteLine("SpeedUp: " + (float) timeForSimple / timeForBlocking);
+                    Console.WriteLine("SpeedUp: " + (float)timeForSimple / timeForBlocking);
                 }
                 else
                 {
@@ -153,13 +155,13 @@ namespace MatrixMPI
 
                     Console.WriteLine($"Non blocking multiply : {timeForNonBlocking}");
 
-                    Console.WriteLine("SpeedUp: " + (float) timeForSimple / timeForNonBlocking);
+                    Console.WriteLine("SpeedUp: " + (float)timeForSimple / timeForNonBlocking);
                 }
                 else
                 {
                     var request = comm.ImmediateReceive<Request>(0, 0);
                     request.Wait();
-                    var data = (Request) request.GetValue();
+                    var data = (Request)request.GetValue();
                     var result = MultiplyMatrices(data.FirstMatrix, data.SecondMatrix);
                     var responce = comm.ImmediateSend(new Responce { ResultMatrix = result, Offset = data.Offset }, 0, 0);
                     responce.Wait();

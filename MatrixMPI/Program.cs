@@ -1,10 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using MatrixMPI;
+using MatrixMPI.Collective;
+using MatrixMPI.PointToPoint;
 
-var rank = 1000;
+var rank = 1200;
 
-MatrixMultiplier.NonBlockingMultiply(rank);
-MatrixMultiplier.BlockingMultiply(rank);
-
+//CollectiveMatrixMultiplier.OneToAllMultiply(rank);
+CollectiveMatrixMultiplier.AllToAllMultiply(args);
 
 

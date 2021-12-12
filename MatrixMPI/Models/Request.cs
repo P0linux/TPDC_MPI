@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MatrixMPI
+namespace MatrixMPI.Models
 {
     [Serializable]
     public class Request
